@@ -149,27 +149,24 @@ fi
 
 ###### Install New Relic Agent ##########
 echo "Checking if New Relic install is required"
-if [ ! -z "$NEWRELIC_INSERT" ]; then
-  if [ -z "$NEWRELIC_TARGET_FILE" ]; then
-    NEWRELIC_TARGET_FILE='./index.js'
-  fi
-  echo "Installing newrelic"
+if [ ! -z "$NEW_RELIC_TARGET_FILE" ]; then
+  echo "Installing newrelic"  
   # install new relic nodejs module
   npm install newrelic@3.0.0 --quiet --userconfig $build_dir/.npmrc 2>&1 | indent
 
   # include module in root server file
   #  -- find line of first included module  
-  HEADVAL=$(grep -n  -e "require\s*\(.*\)" $NEWRELIC_TARGET_FILE | sed -n 1p) 
+  HEADVAL=$(grep -n  -e "require\s*\(.*\)" $NEW_RELIC_TARGET_FILE | sed -n 1p) 
   INSERT_AT_LINE=$(echo $HEADVAL | sed 's/\:/ /'|awk '{print $1}' )
 
   if [ -z "$INSERT_AT_LINE" ]; then
-    INSERT_AT_LINE=$(grep -n  -e "use strict" NEWRELIC_TARGET_FILE | sed -n 1p |sed 's/\:/ /'|awk '{print $1}' |awk '{n = $1 + 1}; END{print n}')
+    INSERT_AT_LINE=$(grep -n  -e "use strict" NEW_RELIC_TARGET_FILE | sed -n 1p |sed 's/\:/ /'|awk '{print $1}' |awk '{n = $1 + 1}; END{print n}')
   fi
 
   if [ -z "$INSERT_AT_LINE" ]; then
     INSERT_AT_LINE=1
   fi
-  sed -i "$INSERT_AT_LINE i\const nr = require('newrelic');" $NEWRELIC_TARGET_FILE  
+  sed -i "$INSERT_AT_LINE i\const nr = require('newrelic');" $NEW_RELIC_TARGET_FILE  
 fi
 
 ####### Create a Procfile if possible
